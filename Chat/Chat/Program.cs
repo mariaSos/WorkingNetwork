@@ -11,7 +11,7 @@ namespace Chat
 
     internal class Program
     {
-        public static void Server()
+        public static async Task Server()
         {
 
             UdpClient udpServer = new UdpClient(12345);
@@ -19,46 +19,67 @@ namespace Chat
             IPEndPoint iPEndPoint = new IPEndPoint(IPAddress.Any, 0);
            
             Console.WriteLine("Ожидаем сообщение от пользователя");
-           
-           
 
-            while(true)
+            //Выходим при вводе команды "Exit" на клиенте
+            string? exit = null;
+            while (exit != "Exit") 
             {
-                try
+                
+                
+
+
+                Task.Run(() =>
                 {
-                    byte[] buffer = udpServer.Receive(ref iPEndPoint);
 
-                    string data = Encoding.ASCII.GetString(buffer);
-
-                    var dataMessage = Message.MessageFromJson(data);
-
-                    Console.WriteLine($" Получено сообщение от {dataMessage.NickName} + время сообщения {dataMessage.DateMessage} ");
-
-                    Console.WriteLine($"{dataMessage.TextMessage}");
-                    
-                    string answer = "Сообщение получено";
-
-                    var mess = new Message()
+                    try
                     {
-                        NickName = dataMessage.NickName,
-                        DateMessage = DateTime.Now,
-                        TextMessage = answer
+                        byte[] buffer = udpServer.Receive(ref iPEndPoint);
+
+                        string data = Encoding.ASCII.GetString(buffer);
+
+                        var dataMessage = Message.MessageFromJson(data);
+
+                        Console.WriteLine($" Получено сообщение от {dataMessage.NickName} + время сообщения {dataMessage.DateMessage} ");
+
+                        Console.WriteLine($"{dataMessage.TextMessage}");
+
+                        string answer = "Сообщение получено";
+
+                        var mess = new Message()
+                        {
+                            NickName = dataMessage.NickName,
+                            DateMessage = DateTime.Now,
+                            TextMessage = answer
+
+                        };
+
+                        data = mess.MessageToJson();
+
+                        buffer = Encoding.ASCII.GetBytes(data);
+
+                        udpServer.Send(buffer, buffer.Length, iPEndPoint);
 
 
-                    };
-
-                    data = mess.MessageToJson();
-
-                    buffer = Encoding.ASCII.GetBytes(data);
-
-                    udpServer.Send(buffer, buffer.Length, iPEndPoint);
 
 
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                });
 
-                } catch ( Exception ex ) 
-                {
-                    Console.WriteLine(ex.Message);
-                }
+                //Добавьте возможность ввести слово Exit в чате клиента,
+                //чтобы можно было завершить его работу.
+                //В коде сервера добавьте ожидание нажатия клавиши, чтобы также прекратить его работу.
+
+                //Буфер для команды "Exit"
+
+              //  byte[] buffer_ex = udpServer.Receive(ref iPEndPoint);
+
+              //  string data_ex = Encoding.ASCII.GetString(buffer_ex);
+
+              //  exit = data_ex;
 
             }
 
@@ -93,28 +114,44 @@ namespace Chat
 
                 Console.WriteLine($" Получено сообщение от {dataMessage.NickName} + время сообщения {dataMessage.DateMessage} ");
 
-                Console.WriteLine($"{dataMessage.TextMessage}");
+                Console.WriteLine($"{dataMessage.TextMessage}!");
 
+                string? exit = null;
+                
+                while ( exit != "Exit" ) {
+                    exit = Console.ReadLine();
+                    
+                }
+                //Если ввели команду "Exit", то передаем ее серверу для окончания
+                if (exit == "Exit")
+                {
+                    var buffer_ex = Encoding.ASCII.GetBytes("Exit");
+
+                    udpClient.Send(buffer_ex, buffer_ex.Length, iPEndPoint);
+                }
 
             } catch( Exception ex )
             {
                 Console.WriteLine(ex.Message);
             }
-
             
         }
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
            
             if (args.Length == 0) {
-                Server();
+                await Task.Run(()=>  Server());
+                
+                    
             }
             else
             {
-                
-                    new Thread(() => Client(args[0], args[1], args[2]))
-                    .Start();
+                for (int i = 0; i < 10; i++)
+                {
+
+                    await Task.Run(() => Client(args[0] + i, args[1], args[2]));
+                }  
 
             }
 
