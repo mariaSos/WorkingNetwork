@@ -74,7 +74,6 @@ namespace Chat
                     };
 
 
-
                     //Отправляем сообщение
                     DataSend(mess, udpServer, iPEndPoint);
 
