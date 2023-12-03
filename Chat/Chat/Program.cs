@@ -15,7 +15,7 @@ namespace Chat
     {
         private const string serverName = "Server";
 
-        public static async Task Server()
+        public static void/*async Task*/ Server()
         {
             Dictionary<string,IPEndPoint> Users = new Dictionary<string,IPEndPoint>();
 
@@ -25,16 +25,14 @@ namespace Chat
            
             Console.WriteLine("Ожидаем сообщение от пользователя");
 
-            //Выходим при вводе команды "Exit" на клиенте
-            string? exit = null;
+           
             while (true) 
             {
                 
                 
 
-
-                Task.Run(() =>
-                {
+              //  Task.Run(() =>
+              //  {
 
                     try
                     {
@@ -50,20 +48,20 @@ namespace Chat
 
                         StringBuilder answer = new StringBuilder("Сообщение получено");
 
-                        if(dataMessage.ToName == "Server")
+                        if(dataMessage.ToName == serverName)
                         {
                             if(dataMessage.TextMessage == "register")
                             {
                                 Users.Add(dataMessage.NickName, new IPEndPoint(iPEndPoint.Address, iPEndPoint.Port));
                                 answer.Append($"Пользователь: {dataMessage.NickName} добавлен");
                             }
-                            else if (dataMessage.TextMessage == "delete")
+                            if (dataMessage.TextMessage == "delete")
                             {
                                 Users.Remove(dataMessage.NickName);
                                 answer.Append($"Пользователь: {dataMessage.NickName} удален");
 
                             }
-                            else if (dataMessage.TextMessage == "list")
+                            if (dataMessage.TextMessage == "list")
                             {
                                 foreach (var item in Users)
                                 {
@@ -113,19 +111,9 @@ namespace Chat
                     {
                         Console.WriteLine(ex.Message);
                     }
-                });
+                //});
 
-            //Добавьте возможность ввести слово Exit в чате клиента,
-            //чтобы можно было завершить его работу.
-            //В коде сервера добавьте ожидание нажатия клавиши, чтобы также прекратить его работу.
-
-            //Буфер для команды "Exit"
-
-            //  byte[] buffer_ex = udpServer.Receive(ref iPEndPoint);
-
-            //  string data_ex = Encoding.ASCII.GetString(buffer_ex);
-
-            //  exit = data_ex;
+            
 
             //4.Мы собираемся сделать наш класс полностью клиент - серверным с возможностью отправки данных сразу нескольким клиентам.
             //Доработаем наш код следующим образом.Представьте что наш сервер умеет работать как медиатор
@@ -150,8 +138,7 @@ namespace Chat
 
             UdpClient udpClient = new UdpClient();
             IPEndPoint iPEndPoint = new IPEndPoint(IPAddress.Parse(ip), 12345);
-           
-            string ToName = string.Empty;
+
 
             string[] message = Console.ReadLine().Split(' ');
 
@@ -162,6 +149,7 @@ namespace Chat
                 ToName = message[0]
             };
 
+            Console.WriteLine(mess.ToName);
             try
             {
                 var data = mess.MessageToJson();
@@ -182,19 +170,7 @@ namespace Chat
 
                 Console.WriteLine($"{dataMessage.TextMessage}!");
 
-                string? exit = null;
-                
-              //  while ( exit != "Exit" ) {
-              //      exit = Console.ReadLine();
-                    
-              //  }
-                //Если ввели команду "Exit", то передаем ее серверу для окончания
-                //if (exit == "Exit")
-               // {
-                //    var buffer_ex = Encoding.ASCII.GetBytes("Exit");
-
-                //    udpClient.Send(buffer_ex, buffer_ex.Length, iPEndPoint);
-              //  }
+       
 
             } catch( Exception ex )
             {
@@ -203,21 +179,23 @@ namespace Chat
             
         }
 
-        static async Task Main(string[] args)
+        static void/*async Task*/ Main(string[] args)
         {
            
             if (args.Length == 0) {
-                await Task.Run(()=>  Server());
+               /* await Task.Run(()=> */ Server()/*)*/;
                 
                     
             }
             else
             {
-               // for (int i = 0; i < 10; i++)
-               // {
+                for (int i = 0; i < 10; i++)
+                {
 
-                    await Task.Run(() => Client(args[0] , args[1]));
-                //}  
+                    /*await Task.Run(() => */
+                    new Thread(()=> Client(args[0] , args[1])).Start()
+                        /*)*/;
+                }  
 
             }
 
