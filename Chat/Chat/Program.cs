@@ -179,7 +179,7 @@ namespace Chat
             
         }
 
-        static void/*async Task*/ Main(string[] args)
+        static  async Task Main(string[] args)
         {
            
             if (args.Length == 0) {
@@ -189,13 +189,13 @@ namespace Chat
             }
             else
             {
-                for (int i = 0; i < 10; i++)
-                {
+                //    for (int i = 0; i < 10; i++)
+                //  {
 
-                    /*await Task.Run(() => */
-                    new Thread(()=> Client(args[0] , args[1])).Start()
-                        /*)*/;
-                }  
+                await Task.Run(() => Client(args[0], args[1]));
+                //new Thread(() => Client(args[0], args[1])).Start());
+
+                // }  
 
             }
 
