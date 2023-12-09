@@ -29,6 +29,13 @@ namespace ModelsEx.Services
 
         IMessageSource messageSource;
 
+        bool work = true;
+
+        //Токен для остановки сервера
+        static private CancellationTokenSource cts = new CancellationTokenSource();
+
+        static private CancellationToken ct = cts.Token;
+
 
         public Server(IMessageSource source)
         {
@@ -42,20 +49,32 @@ namespace ModelsEx.Services
 
             Console.WriteLine("Клиент ожидает сообщение.");
 
-            while (true)
+
+            while (work)
             {
+
                 var message = messageSource.Receive(ref ip);
+                ProcessMessage(message);
 
             }
+
+
+           
         }
+
+        public void Stop() 
+        {
+            work = false; 
+        }
+
 
         private void ProcessMessage(MessageUdp messageUdp)
         {
-            Console.WriteLine($"Получено сообщение от {messageUdp.FromName} " +
-                                $"для {messageUdp.ToName} с командой {messageUdp.Command}:");
-            Console.WriteLine(messageUdp.Text);
+            Console.WriteLine($"Получено сообщение от {messageUdp?.FromName} " +
+                                $"для {messageUdp?.ToName} с командой {messageUdp?.Command}:");
+            Console.WriteLine(messageUdp?.Text);
 
-            switch (messageUdp.Command)
+            switch (messageUdp?.Command)
             {
                 case Command.Message:
                     RelyMessage(messageUdp);
@@ -147,12 +166,6 @@ namespace ModelsEx.Services
             }
         }
 
-
-
-        private void ConfirmMessageReceived(int id)
-        {
-
-        }
 
     }
 }

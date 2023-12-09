@@ -30,7 +30,7 @@ namespace ModelExTests
 
         public void Send(MessageUdp message, IPEndPoint ep)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         public MessageUdp Receive(ref IPEndPoint ep)
@@ -39,6 +39,7 @@ namespace ModelExTests
 
             if(messages.Count == 0)
             {
+                server.Stop();
                 return null;
             }
             return messages.Dequeue();
@@ -48,6 +49,17 @@ namespace ModelExTests
         { 
             server = serv;
 
+
+        }
+
+        //Test
+        public void TestCtx(string testText)
+        {
+            using (MessageContext ctx = new MessageContext())
+            {
+                ctx.Add(new User() {Name = testText }); ;
+                ctx.SaveChanges();
+            }
         }
 
 

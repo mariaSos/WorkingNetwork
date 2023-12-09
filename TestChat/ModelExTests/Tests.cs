@@ -44,38 +44,57 @@ namespace ModelExTests
         public void ServerTest()
         {
 
-
             var mock = new MockMessageSource();
 
             var server = new Server(mock);
 
             mock.AddServer(server);
 
-            server.Work();
+           
+           // Task.Run(() =>
+           // {
+               // mock.TestCtx("1");
+                server.Work();
+               // mock.TestCtx("2");
+           // });
 
-            using(MessageContext ctx = new MessageContext())
-            {
-                Assert.IsTrue(ctx.Users.Count() == 2, "Пользователи не созданы");
 
-                var user1 = ctx.Users.FirstOrDefault(x => x.Name == "Вася");
-                var user2 = ctx.Users.FirstOrDefault(x => x.Name == "Юля");
 
-                Assert.IsNotNull(user1, "Пользователь не созданы");
-                Assert.IsNotNull(user2, "Пользователь не созданы");
+            //mock.TestCtx("3");
 
-                Assert.IsTrue(user1.FromMessages.Count == 1);
-                Assert.IsTrue(user2.FromMessages.Count == 1);
 
-                Assert.IsTrue(user1.ToMessage.Count == 1);
-                Assert.IsTrue(user2.ToMessage.Count == 1);
+            using (MessageContext ctx = new MessageContext())
+                {
+                    Assert.IsTrue(ctx.Users.Count() == 2, "Пользователи не созданы");
 
-                var msg1 = ctx.Messages.FirstOrDefault(x => x.FromUser == user1 && x.ToUser == user2);
-                var msg2 = ctx.Messages.FirstOrDefault(x => x.FromUser == user2 && x.ToUser == user1);
+                    var user1 = ctx.Users.FirstOrDefault(x => x.Name == "Вася");
+                    var user2 = ctx.Users.FirstOrDefault(x => x.Name == "Юля");
 
-                Assert.AreEqual("От Юли", msg2.Text);
-                Assert.AreEqual("От Васи", msg1.Text);
+                    Assert.IsNotNull(user1, "Пользователь не создан");
+                    Assert.IsNotNull(user2, "Пользователь не создан");
 
-            }
+                    Assert.IsTrue(user1.FromMessages.Count == 1);
+                    Assert.IsTrue(user2.FromMessages.Count == 1);
+
+                    Assert.IsTrue(user1.ToMessage.Count == 1);
+                    Assert.IsTrue(user2.ToMessage.Count == 1);
+
+                    var msg1 = ctx.Messages.FirstOrDefault(x => x.FromUser == user1 && x.ToUser == user2);
+                    var msg2 = ctx.Messages.FirstOrDefault(x => x.FromUser == user2 && x.ToUser == user1);
+
+                    Assert.AreEqual("От Юли", msg2.Text);
+                    Assert.AreEqual("От Васи", msg1.Text);
+
+                }
+
+
+         
+
+            
+
+            
+
+            // mock.TestCtx();
 
         }
 
