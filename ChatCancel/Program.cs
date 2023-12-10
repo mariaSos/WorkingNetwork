@@ -46,7 +46,7 @@ namespace ChatCancel
         }
 
 
-        public static void Server(string name)
+        public static async Task Server(string name)
         {
 
             UdpClient udpServer = new UdpClient(12345);
@@ -60,43 +60,46 @@ namespace ChatCancel
 
             while (!ct.IsCancellationRequested)
             {
-                try
+                await Task.Run(() =>
                 {
-
-                    byte[] buffer = udpServer.Receive(ref iPEndPoint);
-
-                    //Получаем сообщение
-                    var dataMessage = DataRecieve(udpServer, iPEndPoint, buffer);
-
-                    messText = dataMessage.TextMessage;
-
-                    string answer = "Сообщение получено";
-
-                    var mess = new Message()
+                    try
                     {
-                        NickName = name,
-                        DateMessage = DateTime.Now,
-                        TextMessage = answer
 
-                    };
+                        byte[] buffer = udpServer.Receive(ref iPEndPoint);
 
-                    
-                    if (messText == "Exit")
-                    {
-                        //Токен для остановки сервера
+                        //Получаем сообщение
+                        var dataMessage = DataRecieve(udpServer, iPEndPoint, buffer);
 
-                        cts.Cancel();
+                        messText = dataMessage.TextMessage;
+
+                        string answer = "Сообщение получено";
+
+                        var mess = new Message()
+                        {
+                            NickName = name,
+                            DateMessage = DateTime.Now,
+                            TextMessage = answer
+
+                        };
+
+
+                        if (messText == "Exit")
+                        {
+                            //Токен для остановки сервера
+
+                            cts.Cancel();
+
+                        }
+
+                        //Отправляем сообщение
+                        DataSend(mess, udpServer, iPEndPoint);
 
                     }
-
-                    //Отправляем сообщение
-                    DataSend(mess, udpServer, iPEndPoint);
-
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                });
 
             }
 
@@ -117,49 +120,49 @@ namespace ChatCancel
             };
 
 
-       
-                while (message != "Exit")
+
+            while (message != "Exit")
+            {
+
+                message = Console.ReadLine() ?? "Пустое сообщение";
+
+                mess.TextMessage = message ?? "Пустое сообщение";
+
+                mess.DateMessage = DateTime.Now;
+
+                try
                 {
 
-                    message = Console.ReadLine() ?? "Пустое сообщение";
+                    //Отправляем сообщение
+                    DataSend(mess, udpClient, iPEndPoint);
 
-                    mess.TextMessage = message ?? "Пустое сообщение";
+                    Console.WriteLine("Сообщение отправлено");
 
-                    mess.DateMessage = DateTime.Now;
+                    var buffer = udpClient.Receive(ref iPEndPoint);
 
-                    try
-                    {
+                    //Получаем сообщение
+                    var dataMessage = DataRecieve(udpClient, iPEndPoint, buffer);
 
-                        //Отправляем сообщение
-                        DataSend(mess, udpClient, iPEndPoint);
-
-                        Console.WriteLine("Сообщение отправлено");
-
-                        var buffer = udpClient.Receive(ref iPEndPoint);
-
-                        //Получаем сообщение
-                        var dataMessage = DataRecieve(udpClient, iPEndPoint, buffer);
-
-                        string? messText = null;
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
-
+                    string? messText = null;
                 }
-         
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+
             }
-        static void Main(string[] args)
+
+        }
+        static async Task Main(string[] args)
         {
 
             if (args.Length == 0)
             {
-                Server("Сервер");
+                await Task.Run(() =>  Server("Сервер"));
             }
             else
             {
-                
+
                 Client(args[0], args[1]);
 
             }
