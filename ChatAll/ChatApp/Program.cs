@@ -1,7 +1,6 @@
 ﻿using ChatCommon;
 using ChatNetWork;
 using System.Net;
-//using System.Net;
 
 namespace ChatApp;
 
@@ -12,14 +11,18 @@ class Program
     
     static void Main(string[] args)
     {
-        UdpMessageSource source = new UdpMessageSource();
+        if (args.Length == 0)
+        {
+            Server<IPEndPoint> server = new Server<IPEndPoint>(new UdpMessageSource());
+            server.Work();
+        }
 
-        Server<EndPoint> server = new Server<EndPoint>(source);
-
-
-
-        // serv.Work();
-
-        Console.WriteLine("Hello, World!");
+        else
+        {
+            UdpSourceClient source = new UdpSourceClient(args[0], Int32.Parse(args[1]));
+            Client<IPEndPoint> client = new Client<IPEndPoint>(source, args[2]);
+            client.Start();
+        }
+ 
     }
 }

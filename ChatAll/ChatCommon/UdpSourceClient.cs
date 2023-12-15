@@ -17,7 +17,6 @@ namespace ChatCommon
         public UdpSourceClient(string address, int port)
         {
             udpClient = new UdpClient(address, port);
-            ipEndPoint = new IPEndPoint(IPAddress.Parse(address), 0);
         }
 
 

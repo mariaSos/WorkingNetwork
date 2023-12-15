@@ -11,25 +11,19 @@ namespace ChatNetWork
 {
     public class Client<T> 
     {
-        //T ipServer;
-        UdpClient udpClient;
-
+        
         private readonly string _adress;
         private readonly int _port;
         private readonly string _name;
-
         IMessageSourceClient<T> messageSource;
+        
 
-        public Client(IMessageSourceClient<T> source, string adress, int port, string name)
+        public Client(IMessageSourceClient<T> source, string name)
         {
-            _adress = adress;
-            _port = port;
-            _name = name;
-            messageSource = source;
-            udpClient = new UdpClient(_port);
             
-            //ipServer = messageSource.CreateNewT(adress, port);
-                //new IPEndPoint(IPAddress.Parse(_adress), _port);
+            _name = name;
+            
+            messageSource = source;
 
 
         }
@@ -37,7 +31,9 @@ namespace ChatNetWork
         public void Start()
         {
             T ep = messageSource.CreateNewT();
+
             new Thread(() => { Listener(ep); }).Start();
+
             Sender(ep);
         }
 
@@ -51,6 +47,7 @@ namespace ChatNetWork
                 {
 
                     var message = messageSource.Receive(ref ep);
+
                     Console.WriteLine("Получено сообщение от: " + message.FromName);
                     Console.WriteLine(message.Text);
 
