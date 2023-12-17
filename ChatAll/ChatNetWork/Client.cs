@@ -12,8 +12,8 @@ namespace ChatNetWork
     public class Client<T> 
     {
         
-        private readonly string _adress;
-        private readonly int _port;
+       // private readonly string _adress;
+       // private readonly int _port;
         private readonly string _name;
         IMessageSourceClient<T> messageSource;
         

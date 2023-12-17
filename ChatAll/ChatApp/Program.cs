@@ -19,8 +19,9 @@ class Program
 
         else
         {
-            UdpSourceClient source = new UdpSourceClient(args[0], Int32.Parse(args[1]));
-            Client<IPEndPoint> client = new Client<IPEndPoint>(source, args[2]);
+            //UdpSourceClient source = new UdpSourceClient(args[0], Int32.Parse(args[1]));
+            UdpSourceClient source = new UdpSourceClient();
+            Client<IPEndPoint> client = new Client<IPEndPoint>(source, args[0]);
             client.Start();
         }
  

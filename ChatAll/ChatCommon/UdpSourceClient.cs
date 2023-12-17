@@ -14,9 +14,10 @@ namespace ChatCommon
 
         private IPEndPoint ipEndPoint;
 
-        public UdpSourceClient(string address, int port)
+        public UdpSourceClient(string address = "127.0.0.1", int port = 12345)
         {
             udpClient = new UdpClient(address, port);
+
         }
 
 
@@ -37,7 +38,7 @@ namespace ChatCommon
 
         public MessageUdp Receive(ref IPEndPoint fromAddr)
         {
-            byte[] receiveBytes = udpClient.Receive(ref ipEndPoint);
+            byte[] receiveBytes = udpClient.Receive(ref fromAddr);
             string receivedData = Encoding.ASCII.GetString(receiveBytes);
 
             return MessageUdp.MessageFromJson(receivedData);
