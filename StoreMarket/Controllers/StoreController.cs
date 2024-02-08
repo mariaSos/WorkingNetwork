@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StoreMarket.Contexts;
 using StoreMarket.Contracts.Requests;
@@ -49,6 +50,27 @@ namespace StoreMarket.Controllers
             try
             {
                 var result = storeContext.Stores.Add(store).Entity;
+
+                storeContext.SaveChanges();
+                return Ok(new StoreResponse(result));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+
+        [HttpDelete]
+        [Route("storesDelete/{id}")]
+
+        public ActionResult<StoreResponse> DeleteStore(StoreDeleteRequest request)
+        {
+            Store store = request.StoreGetEntity();
+            try
+            {
+                var result = storeContext.Stores.Remove(store).Entity;
 
                 storeContext.SaveChanges();
                 return Ok(new StoreResponse(result));

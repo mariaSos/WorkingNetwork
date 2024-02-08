@@ -58,6 +58,28 @@ namespace StoreMarket.Controllers
 
         }
 
+
+        [HttpDelete]
+        [Route("categoriesDelete/{id}")]
+
+        public ActionResult<CategoryResponse> DeleteCategories(CategoryDeleteRequest request)
+        {
+            Category category = request.CategoryGetEntity();
+            try
+            {
+                var result = storeContext.Categories.Remove(category).Entity;
+
+                storeContext.SaveChanges();
+                return Ok(new CategoryResponse(result));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+
         private StoreContext storeContext;
 
         public CategoryController(StoreContext context)

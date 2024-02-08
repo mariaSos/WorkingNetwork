@@ -10,8 +10,7 @@ namespace StoreMarket.Controllers
     [Route("[controller]")]
 
 
-
-    public class ProductsController : ControllerBase
+    public class ProductController : ControllerBase
     {
         [HttpGet]
         [Route("products/{id}")]
@@ -60,10 +59,30 @@ namespace StoreMarket.Controllers
         }
 
 
+        [HttpDelete]
+        [Route("productsDelete/{id}")]
+
+        public ActionResult<ProductResponse> DeleteProduct(ProductDeleteRequest request)
+        {
+            Product product = request.ProductGetEntity();
+            try
+            {
+                var result = storeContext.Products.Remove(product).Entity;
+
+                storeContext.SaveChanges();
+                return Ok(new ProductResponse(result));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
 
         private StoreContext storeContext;
 
-        public ProductsController(StoreContext context)
+        public ProductController(StoreContext context)
         {
             storeContext = context;
 
