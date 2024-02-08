@@ -59,7 +59,6 @@ namespace StoreMarket.Contexts
                 entity.HasKey(p => p.Id).HasName("store_pkey");
                 entity.ToTable("Stores");
 
-
             });
 
 
