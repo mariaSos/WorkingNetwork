@@ -4,6 +4,7 @@ using StoreMarket.Contexts;
 using StoreMarket.Contracts.Requests;
 using StoreMarket.Contracts.Responses;
 using StoreMarket.Models;
+using System.Text;
 
 namespace StoreMarket.Controllers
 {
@@ -49,28 +50,13 @@ namespace StoreMarket.Controllers
 
         public ActionResult<ProductResponse> AddProducts(ProductCreateRequest request)
         {
-            
-            try {
+
+            try
+            {
                 var id = _productServices.AddProduct(request);
                 return Ok(id);
 
-            } catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
             }
-            
-        }
-
-
-        [HttpDelete]
-        [Route("productsDelete/{id}")]
-
-        public ActionResult<ProductResponse> RemoveProduct(ProductDeleteRequest request) { 
-        try
-        {
-            var id = _productServices.RemoveProduct(request);
-            return Ok(id);
-        }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
@@ -78,6 +64,48 @@ namespace StoreMarket.Controllers
 
         }
 
+
+        [HttpDelete]
+        [Route("productsDelete/{id}")]
+
+        public ActionResult<ProductResponse> RemoveProduct(ProductDeleteRequest request)
+        {
+            try
+            {
+                var id = _productServices.RemoveProduct(request);
+                return Ok(id);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+        //Доработайте контроллер, реализовав в нем метод возврата CSV-файла с товарами.
+
+        private string GetCsv(IEnumerable<ProductResponse> products)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+
+            foreach (var p in products)
+            {
+                stringBuilder.Append(p.Name + ";" + p.Price + "\n");
+            }
+
+            return stringBuilder.ToString();
+        }
+
+
+        [HttpGet(template:"GetProductsCSV")]
+        public FileContentResult GetProductsCsv()
+        {
+            var products = _productServices.GetProducts();
+            var content = GetCsv(products);
+
+            return File(new System.Text.UTF8Encoding().GetBytes(content),"text/csv","report.csv");
+        }
+        /*-------------------------------------------------------------------------------------------*/
         
     }
 }
